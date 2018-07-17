@@ -1,11 +1,10 @@
 import { actionCreators, NormalizeActionCreators } from 'ngrx-normalizr';
-
 import { schema } from 'normalizr';
 
-import { createCreateActions, CreateActions } from './create.actions';
-import { createUpdateActions, UpdateActions } from './update.actions';
+import { CreateActions, createCreateActions } from './create.actions';
 import { createDeleteActions, DeleteActions } from './delete.actions';
 import { createSearchActions, SearchActions } from './search.actions';
+import { createUpdateActions, UpdateActions } from './update.actions';
 
 /**
  * Interface for `createActions` return type
@@ -15,7 +14,7 @@ export interface CrudEntityActions<T>
 		CreateActions<T>,
 		UpdateActions<T>,
 		DeleteActions,
-		NormalizeActionCreators<T> {}
+		Partial<NormalizeActionCreators<T>> {}
 
 /**
  * Create "Search", "Create", "Update" and "Delete" actions and types for the given

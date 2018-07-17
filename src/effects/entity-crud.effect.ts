@@ -1,14 +1,11 @@
-import { Action } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
+import { Action } from '@ngrx/store';
 import { actionCreators } from 'ngrx-normalizr';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
 import { schema } from 'normalizr';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/catch';
+import { Observable, of } from 'rxjs';
+import { catchError, mergeMap, switchMap } from 'rxjs/operators';
 
-import { createActions } from '../actions/index';
+import { createActions } from '../actions';
 import { PayloadAction } from '../classes/payload-action';
 
 /**
@@ -21,10 +18,10 @@ export class EntityCrudEffect<T> {
 	private entityActions: any;
 
 	/**
-   * Constructs a new class of a typed `CrudEffectFactory`.
-   * @param actions$ The actions observable of an `ngrx-store`
-   * @param entitySchema The `normalizr` schema to create effects for
-   */
+	 * Constructs a new class of a typed `CrudEffectFactory`.
+	 * @param actions$ The actions observable of an `ngrx-store`
+	 * @param entitySchema The `normalizr` schema to create effects for
+	 */
 	constructor(
 		protected actions$: Actions,
 		protected entitySchema: schema.Entity
@@ -34,29 +31,32 @@ export class EntityCrudEffect<T> {
 	}
 
 	/**
-   * Create a typed split effect
-   */
+	 * Create a typed split effect
+	 */
 	private createEffect<T>(
 		actionType: string,
 		actionHandler: (action: Action) => Observable<T>,
 		successActionCreator: (result: T) => [Action, Action],
 		errorActionCreator: (error: any) => Action
 	): Observable<Action> {
-		return this.actions$.ofType(actionType).switchMap((action: Action) =>
-			actionHandler(action)
-				.mergeMap((result: T) => successActionCreator(result))
-				.catch((error: any) => of(errorActionCreator(error)))
+		return this.actions$.ofType(actionType).pipe(
+			switchMap((action: Action) =>
+				actionHandler(action).pipe(
+					mergeMap((result: T) => successActionCreator(result)),
+					catchError((error: any) => of(errorActionCreator(error)))
+				)
+			)
 		);
 	}
 
 	/**
-   * Create an effect which will listen to the `SEARCH` typed action and
-   * perform the given action handler. The result will be dispatched to
-   * an `ngrx-normalizr AddData` action and a `SearchComplete` action
-   * with the handler result as payload. 'SearchComplete' is dispatched
-   * with an empty array if any error occurs.
-   * @param actionHandler The handler to call for searching entities
-   */
+	 * Create an effect which will listen to the `SEARCH` typed action and
+	 * perform the given action handler. The result will be dispatched to
+	 * an `ngrx-normalizr AddData` action and a `SearchComplete` action
+	 * with the handler result as payload. 'SearchComplete' is dispatched
+	 * with an empty array if any error occurs.
+	 * @param actionHandler The handler to call for searching entities
+	 */
 	createSearchEffect(
 		actionHandler: (action: PayloadAction<any>) => Observable<T[]>
 	) {
@@ -74,13 +74,13 @@ export class EntityCrudEffect<T> {
 	}
 
 	/**
-   * Create an effect which will listen to the `CREATE` typed action and
-   * perform the given action handler. The result will be dispatched to
-   * an `ngrx-normalizr AddData` action and a `CreateSuccess` action
-   * with the handler result as payload. 'CreateFail' is dispatched
-   * with the error argument of the observables catch handler.
-   * @param actionHandler The handler to call for creating entities
-   */
+	 * Create an effect which will listen to the `CREATE` typed action and
+	 * perform the given action handler. The result will be dispatched to
+	 * an `ngrx-normalizr AddData` action and a `CreateSuccess` action
+	 * with the handler result as payload. 'CreateFail' is dispatched
+	 * with the error argument of the observables catch handler.
+	 * @param actionHandler The handler to call for creating entities
+	 */
 	createCreateEffect(
 		actionHandler: (action: PayloadAction<T>) => Observable<T>
 	) {
@@ -98,13 +98,13 @@ export class EntityCrudEffect<T> {
 	}
 
 	/**
-   * Create an effect which will listen to the `UPDATE` typed action and
-   * perform the given action handler. The result will be dispatched to
-   * an `ngrx-normalizr AddData` action and an `UpdateSuccess` action
-   * with the handler result as payload. 'UpdateFail' is dispatched
-   * with the error argument of the observables catch handler.
-   * @param actionHandler The handler to call for creating entities
-   */
+	 * Create an effect which will listen to the `UPDATE` typed action and
+	 * perform the given action handler. The result will be dispatched to
+	 * an `ngrx-normalizr AddData` action and an `UpdateSuccess` action
+	 * with the handler result as payload. 'UpdateFail' is dispatched
+	 * with the error argument of the observables catch handler.
+	 * @param actionHandler The handler to call for creating entities
+	 */
 	createUpdateEffect(
 		actionHandler: (action: PayloadAction<T>) => Observable<T>
 	) {
@@ -122,13 +122,13 @@ export class EntityCrudEffect<T> {
 	}
 
 	/**
-   * Create an effect which will listen to the `DELETE` typed action and
-   * perform the given action handler. The result will be dispatched to
-   * an `ngrx-normalizr RemoveData` action and an `DeleteSuccess` action
-   * with the handler result as payload. 'DeleteFail' is dispatched
-   * with the error argument of the observables catch handler.
-   * @param actionHandler The handler to call for deleting an entity
-   */
+	 * Create an effect which will listen to the `DELETE` typed action and
+	 * perform the given action handler. The result will be dispatched to
+	 * an `ngrx-normalizr RemoveData` action and an `DeleteSuccess` action
+	 * with the handler result as payload. 'DeleteFail' is dispatched
+	 * with the error argument of the observables catch handler.
+	 * @param actionHandler The handler to call for deleting an entity
+	 */
 	createDeleteEffect(
 		actionHandler: (action: PayloadAction<string>) => Observable<string>
 	) {

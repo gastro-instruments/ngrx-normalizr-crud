@@ -1,21 +1,15 @@
+import {
+	ActivatedRouteSnapshot,
+	CanActivate,
+	CanActivateChild
+} from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AddData, createSchemaSelectors } from 'ngrx-normalizr';
-import {
-	CanActivate,
-	CanActivateChild,
-	ActivatedRouteSnapshot
-} from '@angular/router';
-import { of } from 'rxjs/observable/of';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/catch';
-
 import { schema } from 'normalizr';
+import { Observable, of } from 'rxjs';
+import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
 
-import { createActions } from '../../actions/index';
+import { createActions } from '../../actions';
 
 /**
  * Guards are hooks into the route resolution process, providing an opportunity
@@ -39,8 +33,10 @@ export abstract class EntityExistsGuard<T, State>
 	hasEntityInStore(id: string): Observable<boolean> {
 		return this.store
 			.select(createSchemaSelectors<T>(this.entitySchema).getNormalizedEntities)
-			.map((entities: any) => !!entities[this.entitySchema.key][id])
-			.take(1);
+			.pipe(
+				map((entities: any) => !!entities[this.entitySchema.key][id]),
+				take(1)
+			);
 	}
 
 	/**
@@ -49,8 +45,8 @@ export abstract class EntityExistsGuard<T, State>
 	 */
 	hasEntityInApi(id: string): Observable<boolean> {
 		const actions = createActions<T>(this.entitySchema);
-		return this.getForId(id)
-			.do(response => {
+		return this.getForId(id).pipe(
+			tap(response => {
 				this.store.dispatch(
 					new AddData<T>({
 						data: Array.isArray(response) ? response : [response],
@@ -58,9 +54,10 @@ export abstract class EntityExistsGuard<T, State>
 					})
 				);
 				this.store.dispatch(new actions.Load(response));
-			})
-			.map(res => !!res)
-			.catch(err => this.onNotFound(err));
+			}),
+			map(res => !!res),
+			catchError(err => this.onNotFound(err))
+		);
 	}
 
 	/**
@@ -69,13 +66,15 @@ export abstract class EntityExistsGuard<T, State>
 	 * API.
 	 */
 	hasEntity(id: string): Observable<boolean> {
-		return this.hasEntityInStore(id).switchMap(inStore => {
-			if (inStore) {
-				return of(inStore);
-			}
+		return this.hasEntityInStore(id).pipe(
+			switchMap(inStore => {
+				if (inStore) {
+					return of(inStore);
+				}
 
-			return this.hasEntityInApi(id);
-		});
+				return this.hasEntityInApi(id);
+			})
+		);
 	}
 
 	/**

@@ -1,20 +1,15 @@
-import { Store } from '@ngrx/store';
 import {
+	ActivatedRouteSnapshot,
 	CanActivate,
-	CanActivateChild,
-	ActivatedRouteSnapshot
+	CanActivateChild
 } from '@angular/router';
-import { of } from 'rxjs/observable/of';
-import { schema } from 'normalizr';
+import { Store } from '@ngrx/store';
 import { AddData, createSchemaSelectors } from 'ngrx-normalizr';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/catch';
+import { schema } from 'normalizr';
+import { Observable, of } from 'rxjs';
+import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
 
-import { createActions } from '../../actions/index';
+import { createActions } from '../../actions';
 
 /**
  * Guards are hooks into the route resolution process, providing an opportunity
@@ -36,15 +31,17 @@ export abstract class EntitiesExistsGuard<T, State>
 	hasEntitiesInStore(): Observable<boolean> {
 		return this.store
 			.select(createSchemaSelectors<T>(this.entitySchema).getNormalizedEntities)
-			.map(
-				entities =>
-					!!(
-						entities &&
-						entities[this.entitySchema.key] &&
-						Object.keys(entities[this.entitySchema.key]).length
-					)
-			)
-			.take(1);
+			.pipe(
+				map(
+					entities =>
+						!!(
+							entities &&
+							entities[this.entitySchema.key] &&
+							Object.keys(entities[this.entitySchema.key]).length
+						)
+				),
+				take(1)
+			);
 	}
 
 	/**
@@ -53,15 +50,16 @@ export abstract class EntitiesExistsGuard<T, State>
 	 */
 	hasEntitiesInApi(query: string): Observable<boolean> {
 		const actions = createActions<T>(this.entitySchema);
-		return this.getRequest(query)
-			.do(response => {
+		return this.getRequest(query).pipe(
+			tap(response => {
 				this.store.dispatch(
 					new AddData<T>({ data: response, schema: this.entitySchema })
 				);
 				this.store.dispatch(new actions.SearchComplete(response));
-			})
-			.map(action => true)
-			.catch(err => this.onNotFound(err));
+			}),
+			map(action => true),
+			catchError(err => this.onNotFound(err))
+		);
 	}
 
 	/**
@@ -70,13 +68,15 @@ export abstract class EntitiesExistsGuard<T, State>
 	 * API.
 	 */
 	hasEntities(query: string): Observable<boolean> {
-		return this.hasEntitiesInStore().switchMap(inStore => {
-			if (inStore) {
-				return of(inStore);
-			}
+		return this.hasEntitiesInStore().pipe(
+			switchMap(inStore => {
+				if (inStore) {
+					return of(inStore);
+				}
 
-			return this.hasEntitiesInApi(query);
-		});
+				return this.hasEntitiesInApi(query);
+			})
+		);
 	}
 
 	/**
