@@ -34,7 +34,14 @@ export abstract class EntityExistsGuard<T, State>
 		return this.store
 			.select(createSchemaSelectors<T>(this.entitySchema).getNormalizedEntities)
 			.pipe(
-				map((entities: any) => !!entities[this.entitySchema.key][id]),
+				map(
+					(entities: any) =>
+						!!(
+							entities &&
+							entities[this.entitySchema.key] &&
+							entities[this.entitySchema.key][id]
+						)
+				),
 				take(1)
 			);
 	}
