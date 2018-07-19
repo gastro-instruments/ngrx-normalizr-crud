@@ -3,8 +3,8 @@ import {
 	CanActivate,
 	CanActivateChild
 } from '@angular/router';
+import { AddData, createSchemaSelectors } from '@gi/ngrx-normalizr';
 import { Store } from '@ngrx/store';
-import { AddData, createSchemaSelectors } from 'ngrx-normalizr';
 import { schema } from 'normalizr';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap, take, tap } from 'rxjs/operators';

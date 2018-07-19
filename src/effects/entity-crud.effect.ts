@@ -1,6 +1,6 @@
+import { actionCreators } from '@gi/ngrx-normalizr';
 import { Actions } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
-import { actionCreators } from 'ngrx-normalizr';
 import { schema } from 'normalizr';
 import { Observable, of } from 'rxjs';
 import { catchError, mergeMap, switchMap } from 'rxjs/operators';

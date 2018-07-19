@@ -1,4 +1,4 @@
-import { actionCreators, NormalizeActionCreators } from 'ngrx-normalizr';
+import { actionCreators, NormalizeActionCreators } from '@gi/ngrx-normalizr';
 import { schema } from 'normalizr';
 
 import { CreateActions, createCreateActions } from './create.actions';

@@ -1,6 +1,7 @@
-import { MemoizedSelector, createSelector } from '@ngrx/store';
-import { createSchemaSelectors } from 'ngrx-normalizr';
+import { createSchemaSelectors } from '@gi/ngrx-normalizr';
+import { createSelector, MemoizedSelector } from '@ngrx/store';
 import { schema } from 'normalizr';
+
 import { NormalizedEntityState } from '../reducers/reducer';
 
 export interface EntityStateSelectors<T> {
