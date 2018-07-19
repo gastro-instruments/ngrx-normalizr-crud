@@ -1,6 +1,6 @@
 # WIP: ngrx-normalizr-crud
 
-[![Build Status](https://travis-ci.org/gastro-instruments/ngrx-normalizr-crud.svg?branch=%40gi-1.x.x)](https://travis-ci.org/michaelkrone/ngrx-normalizr-crud)
+[![Build Status](https://travis-ci.org/gastro-instruments/ngrx-normalizr-crud.svg?branch=%40gi-1.x.x)](https://travis-ci.org/gastro-instruments/ngrx-normalizr-crud)
 ![AOT compatible](https://img.shields.io/badge/aot-compatible-blue.svg)
 
 > Actions, effects, reducers, selectors and guards for [ngrx-normalizr](https://github.com/michaelkrone/ngrx-normalizr).
