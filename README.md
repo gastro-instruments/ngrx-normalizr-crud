@@ -1,6 +1,6 @@
 # WIP: ngrx-normalizr-crud
 
-[![Build Status](https://travis-ci.org/michaelkrone/ngrx-normalizr-crud.svg?branch=master)](https://travis-ci.org/michaelkrone/ngrx-normalizr-crud)
+[![Build Status](https://travis-ci.org/gastro-instruments/ngrx-normalizr-crud.svg?branch=%40gi-1.x.x)](https://travis-ci.org/michaelkrone/ngrx-normalizr-crud)
 ![AOT compatible](https://img.shields.io/badge/aot-compatible-blue.svg)
 
 > Actions, effects, reducers, selectors and guards for [ngrx-normalizr](https://github.com/michaelkrone/ngrx-normalizr).
@@ -11,16 +11,16 @@ entity states.
 ## Installation
 To install this package:
 ```sh
-yarn add ngrx-normalizr-crud
-npm i ngrx-normalizr-crud
+yarn add @gi/ngrx-normalizr-crud
+npm i @gi/ngrx-normalizr-crud
 ```
 
 ### Peer dependencies
 *ngrx-normalizr-crud* uses `@ngrx/store` and `ngrx-normalizer` as peer dependencies, so you need to install them if not present already:
 
 ```sh
-yarn add @ngrx/store ngrx-normalizer
-npm i @ngrx/store ngrx-normalizer
+yarn add @ngrx/store @gi/ngrx-normalizer
+npm i @ngrx/store @gi/ngrx-normalizer
 ```
 ## Usage
 Also refer to the [Typedoc documentation](https://michaelkrone.github.io/ngrx-normalizr-crud/).
